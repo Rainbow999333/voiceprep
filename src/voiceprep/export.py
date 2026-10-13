@@ -16,7 +16,12 @@ def _safe_list_field(value: Any, name: str) -> str:
 
 
 @click.command("export")
-@click.option("--tag", "tags", multiple=True, required=True, help="Tag to match; repeat for multiple tags.")
+@click.option(
+    "--tag",
+    "tags",
+    multiple=True,
+    help="Tag to match; repeat for multiple tags. Omit to export all records.",
+)
 @click.option("--any", "match_any", is_flag=True, help="Match any tag instead of requiring all tags.")
 @click.option("--format", "output_format", type=click.Choice(["paths", "list"]), default="paths", show_default=True)
 @click.option("--output", type=click.Path(path_type=Path), help="Write to a file instead of stdout.")
@@ -34,8 +39,8 @@ def export_command(
 ) -> None:
     """Export records matching tags as paths or GPT-SoVITS .list lines."""
     requested = {tag.strip().casefold() for tag in tags if tag.strip()}
-    if not requested:
-        raise click.ClickException("Provide at least one non-empty --tag value.")
+    if tags and not requested:
+        raise click.ClickException("Provide a non-empty --tag value.")
     try:
         db = load(db_path)
     except StoreError as exc:
@@ -44,7 +49,7 @@ def export_command(
     selected: list[dict[str, Any]] = []
     for record in db["files"].values():
         available = set(record.get("tags", []))
-        if (match_any and requested & available) or (not match_any and requested <= available):
+        if not requested or (match_any and requested & available) or (not match_any and requested <= available):
             selected.append(record)
     selected.sort(key=lambda record: record["path"])
 

@@ -62,6 +62,28 @@ def test_tag_add_supports_recursive_glob_and_rejects_empty_matches(tmp_path: Pat
     assert "No supported audio files matched" in missing.output
 
 
+def test_tag_remove_accepts_a_directory(tmp_path: Path) -> None:
+    inside = tmp_path / "clips" / "inside.wav"
+    outside = tmp_path / "outside.wav"
+    inside.parent.mkdir()
+    inside.write_bytes(b"inside")
+    outside.write_bytes(b"outside")
+    db_path = tmp_path / "voiceprep.json"
+    runner = CliRunner()
+    assert _add(runner, db_path, inside, "demo").exit_code == 0
+    assert _add(runner, db_path, outside, "demo").exit_code == 0
+
+    removed = runner.invoke(
+        cli,
+        ["tag", "remove", str(inside.parent), "demo", "--db", str(db_path)],
+    )
+
+    assert removed.exit_code == 0, removed.output
+    records = {record["path"]: record for record in load(db_path)["files"].values()}
+    assert records[str(inside.resolve())]["tags"] == []
+    assert records[str(outside.resolve())]["tags"] == ["demo"]
+
+
 def test_export_and_or_paths_and_list_format(tmp_path: Path) -> None:
     calm = tmp_path / "calm.wav"
     bright = tmp_path / "bright.wav"
@@ -120,3 +142,19 @@ def test_export_writes_output_file(tmp_path: Path) -> None:
     )
     assert result.exit_code == 0, result.output
     assert output.read_text(encoding="utf-8") == f"{audio.resolve()}\n"
+
+
+def test_export_without_tags_includes_all_records(tmp_path: Path) -> None:
+    first = tmp_path / "first.wav"
+    second = tmp_path / "second.wav"
+    first.write_bytes(b"first")
+    second.write_bytes(b"second")
+    db_path = tmp_path / "voiceprep.json"
+    runner = CliRunner()
+    assert _add(runner, db_path, first, "calm").exit_code == 0
+    assert _add(runner, db_path, second, "bright").exit_code == 0
+
+    result = runner.invoke(cli, ["export", "--db", str(db_path)])
+
+    assert result.exit_code == 0, result.output
+    assert result.output.splitlines() == sorted([str(first.resolve()), str(second.resolve())])

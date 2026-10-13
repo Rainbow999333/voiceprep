@@ -16,6 +16,9 @@ dependencies = [
 dev = [
     "pytest>=7.0",
 ]
+whisper = [
+    "openai-whisper",
+]
 
 [project.scripts]
 voiceprep = "voiceprep.cli:cli"
