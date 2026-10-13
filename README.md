@@ -24,6 +24,7 @@ Requires Python 3.10+.
 git clone https://github.com/Rainbow999333/voiceprep.git
 cd voiceprep
 python -m venv .venv
+source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 python -m pytest -q
 ```
@@ -65,6 +66,8 @@ voiceprep transcribe ./samples --model tiny --lang zh --formats srt,txt,json --o
 # Local FFmpeg conversion; originals stay untouched
 voiceprep convert ./samples --out-dir samples_16k --sr 16000 --mono
 ```
+
+`transcribe` writes transcript fields to the database only when `--db` is given (like `scan --db`). Known limitation: records are keyed by content hash, so files produced by `convert` become separate records from their originals; transcribe the originals if you want transcripts and tags on the same record.
 
 `transcribe` skips a file when all requested outputs already exist. Use `--force` to run it again. `convert` also skips existing outputs unless `--force` is supplied.
 

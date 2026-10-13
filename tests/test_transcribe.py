@@ -149,3 +149,14 @@ def test_cli_writes_transcript_to_store(tmp_path: Path, monkeypatch):
     # export --format list now carries the transcript text (M1 <-> M2 integration)
     res = runner.invoke(cli, ["export", "--tag", "calm", "--format", "list", "--db", str(db)])
     assert res.output.strip().endswith("|speaker|auto|你好 世界")
+
+
+def test_cli_without_db_does_not_write_store(tmp_path: Path, monkeypatch):
+    audio = tmp_path / "in"; audio.mkdir()
+    (audio / "x.wav").write_bytes(b"x-audio")
+    monkeypatch.setattr(tr.transcribe_files, "__kwdefaults__",
+                        {**tr.transcribe_files.__kwdefaults__, "model_loader": lambda n: FakeModel()})
+    with CliRunner().isolated_filesystem(temp_dir=tmp_path):
+        res = CliRunner().invoke(cli, ["transcribe", str(audio), "--out-dir", "o", "--formats", "txt"])
+        assert res.exit_code == 0 and "1 transcribed" in res.output
+        assert not Path("voiceprep.json").exists()

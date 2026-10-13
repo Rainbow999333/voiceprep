@@ -6,12 +6,12 @@ This project uses AI assistance openly. The human author owns the project decisi
 
 | Participant | Contribution |
 |---|---|
-| Tu Hao / Mr.Liang (human author) | Chose the problem and local-first constraints; defined requirements and architecture; supplied the original Cursor prompt; ran and captured CLI/test evidence; reviewed PR #2; selected scope and model candidates; authorizes repository operations; will test real audio, approve PR #3, record the demo, and submit the project. |
+| Tu Hao / Mr.Liang (human author) | Chose the problem and local-first constraints; defined requirements; reviewed and approved the architecture; supplied the original Cursor prompt; ran and captured CLI/test evidence; reviewed PR #2; selected scope and model candidates; authorizes repository operations; will test real audio, approve PR #3, record the demo, and submit the project. |
 | Cursor free tier | Generated the initial minimal Click scaffold and scan tests from the human author's prompt. |
 | OpenAI Codex / GPT | Reviewed architecture and evidence; implemented M1 storage/tag/export/doctor; merged the approved PR #2 under explicit authorization; reviewed and integrated Grok's M2/M3 patch; implemented follow-up fixes and tests; maintains technical handoff notes. |
-| Grok Bot | Researched challenge fit and licenses; drafted project documentation; reviewed PR #2; generated the M2/M3 patch for local Whisper and FFmpeg workflows. |
+| Grok Bot | Researched challenge fit and licenses; drafted the initial architecture and plan; drafted project documentation; reviewed PR #2; generated the M2/M3 patch for local Whisper and FFmpeg workflows, including the v2 patch integrating transcription results with the frozen `store.py` interface. |
 
-The original commits were created by the human author. Later GitHub and commit operations performed by Codex are done only with the author's explicit authorization through the author's authenticated account. AI-generated code is not treated as accepted until tests pass and the human author reviews the pull request.
+The original commits were created by the human author. The public GitHub repository was created, and the first push performed, by Codex with the author's explicit authorization through the author's logged-in `gh` account. Later GitHub and commit operations performed by Codex are done only with the author's explicit authorization through the author's authenticated account. AI-generated code is not treated as accepted until tests pass and the human author reviews the pull request.
 
 ## Attribution log
 
@@ -29,7 +29,7 @@ The private project collaboration center contains screenshots covering:
 1. The original prompt and Cursor generation result.
 2. `pytest` passing.
 3. `voiceprep --help` and `voiceprep scan .` output.
-4. The first commit and clean working tree.
+4. A clean working tree. The screenshots do not show the first commit; commit `ec94c8e` is evidenced by the public GitHub history.
 
 Public repository history provides additional evidence for commits, issues, branches, and pull requests. Private screenshots can be attached to the hackathon submission where appropriate.
 

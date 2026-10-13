@@ -134,22 +134,25 @@ def _parse_formats(value: str) -> list[str]:
 @click.option("--formats", default="srt,txt,json", show_default=True,
               help="Comma-separated output formats.")
 @click.option("--force", is_flag=True, help="Re-transcribe even if outputs exist.")
-@click.option("--db", "db_path", type=click.Path(path_type=Path), default="voiceprep.json",
-              show_default=True, help="voiceprep database to update with transcript fields.")
+@click.option("--db", "db_path", type=click.Path(path_type=Path), default=None,
+              help="voiceprep database to update with transcript fields (only written when given).")
 def transcribe_cmd(paths, out_dir, model_name, lang, formats, force, db_path) -> None:
     """Transcribe audio files locally with Whisper (resumable)."""
     fmts = _parse_formats(formats)
     stems = collect_audio(paths)
     if not stems:
         raise click.ClickException("No audio files found.")
-    try:
-        db = load(db_path)
-    except StoreError as exc:
-        raise click.ClickException(str(exc)) from exc
-    adapter = StoreAdapter(db, db_path, model_name, lang)
+    on_done = on_fail = None
+    if db_path is not None:
+        try:
+            db = load(db_path)
+        except StoreError as exc:
+            raise click.ClickException(str(exc)) from exc
+        adapter = StoreAdapter(db, db_path, model_name, lang)
+        on_done, on_fail = adapter.done, adapter.failed
     report = transcribe_files(list(stems), out_dir, model_name=model_name,
                               language=lang, formats=fmts, force=force,
-                              on_done=adapter.done, on_fail=adapter.failed, stems=stems)
+                              on_done=on_done, on_fail=on_fail, stems=stems)
     for key, label in (("skipped", "skip"), ("done", "done"), ("failed", "FAIL")):
         for f in report[key]:
             click.echo(f"{label}  {f}")
