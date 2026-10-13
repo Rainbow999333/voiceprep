@@ -82,10 +82,20 @@ def remove_tags(pattern: str, tags: tuple[str, ...], db_path: Path) -> None:
     """Remove TAGS from stored records whose path matches PATTERN."""
     requested = _normalise_tags(tags)
     db = _load_or_error(db_path)
-    absolute_pattern = str(Path(pattern).expanduser().absolute())
+    candidate = Path(pattern).expanduser()
+    directory = candidate.resolve() if candidate.is_dir() else None
+    absolute_pattern = str(candidate.absolute())
     matched = 0
     for record in db["files"].values():
-        if fnmatch.fnmatch(record["path"], absolute_pattern):
+        record_path = Path(record["path"])
+        in_directory = False
+        if directory is not None:
+            try:
+                record_path.relative_to(directory)
+                in_directory = True
+            except ValueError:
+                pass
+        if in_directory or fnmatch.fnmatch(record["path"], absolute_pattern):
             record["tags"] = sorted(set(record.get("tags", [])) - requested)
             matched += 1
     if not matched:
