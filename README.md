@@ -35,7 +35,7 @@ For local transcription, install the optional Whisper dependency and place FFmpe
 python -m pip install -e ".[whisper]"
 ```
 
-Whisper model weights are downloaded on first use and cached locally. The CLI defaults to `tiny`; the final demo will use `tiny` or `base` after local CPU testing.
+Whisper model weights are downloaded on first use and cached locally. The CLI defaults to `tiny`; the final demo uses `base`, selected after local CPU testing documented below.
 
 ## Usage
 
@@ -105,6 +105,23 @@ Database saves use a temporary file and atomic replacement. Transcription saves 
 
 VoicePrep prepares data; it does not clone voices. Use only your own voice or audio you are explicitly authorized to process. Do not collect or process another person's voice without consent. Demo audio should be self-recorded or publicly licensed, with its source and license documented.
 
+**Demo audio:** Demo audio was generated locally with the open-source [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS) (Apache-2.0; Hugging Face model cards also list Apache-2.0) using its default built-in voice; no real person's voice was cloned or recorded. The audio file itself is not committed to this repository.
+
+## Local test results
+
+Real (non-mock) runs on the author's Windows machine, CPU only, PR #3 head `944d6b2`:
+
+- `pytest`: 35 passed. `voiceprep doctor --strict`: all dependencies found, exit code 0.
+- `scan --db`: wrote real duration, sample rate (48 kHz), and channel count for the author's own recordings.
+- `convert`: ffprobe confirmed output `pcm_s16le`, 16000 Hz, 1 channel; a second run skipped existing output.
+- `transcribe` resume: a repeated run reported `0 transcribed, 1 skipped, 0 failed`. All TXT/SRT/JSON and database files decoded as strict UTF-8.
+- Author's own quiet phone recordings (~6 s and ~9 s, about -37 to -40 dB mean volume): `tiny` produced unusable output (`mmm` on the first clip, many wrong words on the second); `base` was clearly better but still had wrong words. Converting to 16 kHz mono or loudness-normalizing barely changed `base` results, so format conversion was not the cause.
+- Final demo clip (Qwen3-TTS, ~20.9 s, 24 kHz mono MP3): `base` recognized all of the content, differing only in Traditional/Simplified characters and omitted punctuation; the SRT has 8 segments. `tiny` had several clear word errors.
+- Timing was not formally benchmarked. Whisper's "FP16 is not supported on CPU" warning is a normal fallback to FP32, not an error.
+- Windows CMD tip: run `chcp 65001` or use `Get-Content -Encoding utf8` to view UTF-8 output; `type` under code page 936 shows garbled text even though files are correct.
+
+We do not claim high accuracy; the demo proves the local end-to-end workflow.
+
 ## Components and licenses
 
 | Component | Role | License | Execution |
@@ -112,6 +129,7 @@ VoicePrep prepares data; it does not clone voices. Use only your own voice or au
 | [Click](https://github.com/pallets/click) | CLI framework | BSD-3-Clause | Local |
 | [openai-whisper](https://github.com/openai/whisper) | Optional speech-to-text code and weights | MIT | Local |
 | [FFmpeg](https://ffmpeg.org/legal.html) | Separately installed audio tooling | LGPL-2.1-or-later by default; some builds are GPL-2.0-or-later | Local subprocess |
+| [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS) | Generated the demo audio only (not a dependency) | Apache-2.0 | Local, run by the author |
 
 This project is licensed under the [MIT License](LICENSE).
 

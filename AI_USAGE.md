@@ -6,10 +6,11 @@ This project uses AI assistance openly. The human author owns the project decisi
 
 | Participant | Contribution |
 |---|---|
-| Tu Hao / Mr.Liang (human author) | Chose the problem and local-first constraints; defined requirements; reviewed and approved the architecture; supplied the original Cursor prompt; ran and captured CLI/test evidence; reviewed PR #2; selected scope and model candidates; authorizes repository operations; will test real audio, approve PR #3, record the demo, and submit the project. |
+| Tu Hao / Mr.Liang (human author) | Chose the problem and local-first constraints; defined requirements; reviewed and approved the architecture; supplied the original Cursor prompt; ran and captured CLI/test evidence; reviewed PR #2; selected scope and model candidates; authorizes repository operations; tested real audio locally (own recordings and the demo clip), chose the demo audio, and selected `base` as the final demo model; will approve PR #3 and submit the project. |
 | Cursor free tier | Generated the initial minimal Click scaffold and scan tests from the human author's prompt. |
 | OpenAI Codex / GPT | Reviewed architecture and evidence; implemented M1 storage/tag/export/doctor; merged the approved PR #2 under explicit authorization; reviewed and integrated Grok's M2/M3 patch; implemented follow-up fixes and tests; maintains technical handoff notes. |
-| Grok Bot | Researched challenge fit and licenses; drafted the initial architecture and plan; drafted project documentation; reviewed PR #2; generated the M2/M3 patch for local Whisper and FFmpeg workflows, including the v2 patch integrating transcription results with the frozen `store.py` interface. |
+| Qwen3-TTS (open-source AI model, run locally by the author) | Generated the demo audio with its default built-in voice. No voice cloning; no real person's voice was recorded for the demo. |
+| Grok Bot | Researched challenge fit and licenses; drafted the initial architecture and plan; drafted project documentation; reviewed PR #2; generated the M2/M3 patch for local Whisper and FFmpeg workflows, including the v2 patch integrating transcription results with the frozen `store.py` interface; wrote the final test-results/demo-audio documentation, demo script, and submission copy. |
 
 The original commits were created by the human author. The public GitHub repository was created, and the first push performed, by Codex with the author's explicit authorization through the author's logged-in `gh` account. Later GitHub and commit operations performed by Codex are done only with the author's explicit authorization through the author's authenticated account. AI-generated code is not treated as accepted until tests pass and the human author reviews the pull request.
 
@@ -38,7 +39,7 @@ Public repository history provides additional evidence for commits, issues, bran
 - Tests use mocks for Whisper and FFmpeg so routine CI does not download model weights or require system binaries.
 - The author must perform a real local smoke test before the demo.
 - AI suggestions may be changed or rejected when they conflict with the local-only scope, deadline, or safety requirements.
-- The demo will use only self-recorded or explicitly licensed audio.
+- The demo uses AI-generated audio: Demo audio was generated locally with the open-source Qwen3-TTS (https://github.com/QwenLM/Qwen3-TTS, Apache-2.0) using its default built-in voice; no real person's voice was cloned or recorded. The author's own recordings were used only for private local testing.
 
 ## Honesty statement
 
